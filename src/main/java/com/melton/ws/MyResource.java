@@ -14,6 +14,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import com.melton.ws.pojo.SiteAccessBean;
+import com.melton.ws.pojo.SiteAccessEntries;
  
 /**
  * Root resource (exposed at "access" path)
@@ -34,10 +35,10 @@ public class MyResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)   // TEXT_PLAIN
-    public SiteAccessBean getIt(
+    public SiteAccessEntries getIt(
         @DefaultValue("2") @QueryParam("num") int iNumItems) {
     	    	
-        SiteAccessBean sab = null;
+    	SiteAccessEntries listSiteAccess = new SiteAccessEntries();
     
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -70,7 +71,7 @@ public class MyResource {
 	            ts = rs.getTimestamp("create_date");
 	            project = rs.getString("project");
 	
-                sab = new SiteAccessBean( remoteaddr, useragent );     
+	            listSiteAccess.getSiteAccessList().add( new SiteAccessBean( remoteaddr, useragent ) );
             }
         }
         catch(SQLException sqlExc)
@@ -89,7 +90,7 @@ public class MyResource {
             } catch (Exception ex) {}
         }
         
-    return sab;
+    return listSiteAccess;
     
 //    	return sbReturn.toString();
     }
