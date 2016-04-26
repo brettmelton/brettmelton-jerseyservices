@@ -27,15 +27,51 @@ public class MyResource {
 	public MyResource() {
 		super();
 	}
+	
+	@DELETE
+	@Path("/{agent}")
+	public Response deleteEntriesbyAgent(@PathParam("agent") String strAgent) {
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try
+        {
+            conn = getConnectionFromPool();
+            StringBuilder sbSql = new StringBuilder();
+            sbSql.append( "DELETE FROM access_log " );
+            sbSql.append( "WHERE to_days(now()) - to_days(create_date) <= 30 " );
+            sbSql.append( "AND useragent LIKE \"%" );
+            sbSql.append( strAgent );
+            sbSql.append( "%\"" );
+
+            pstmt = conn.prepareStatement(sbSql.toString());
+            pstmt.execute();
+        }
+        catch(SQLException sqlExc)
+        {
+            System.out.println("Exception getting connection from pool: " + sqlExc );
+    		return Response.status(500).entity("SQL Exc: " + sqlExc.getMessage()).build();
+        }
+        finally
+        {
+            try {
+                if( null != pstmt ) pstmt.close();
+                if( null != conn ) conn.close();
+                pstmt = null;
+                conn = null;
+            } catch (Exception ex) {}
+        }
+		return Response.status(202).entity("Agent Strings deleted successfully!").build();
+	}
+	
     /**
      * Method handling HTTP GET requests. The returned object will be sent
-     * to the client as "text/plain" media type.
-     *
-     * @return String that will be returned as a text/plain response.
+     * to the client as json media type.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)   // TEXT_PLAIN
-    public SiteAccessEntries getIt(
+    public SiteAccessEntries getLastAccess(
         @DefaultValue("2") @QueryParam("num") int iNumItems) {
     	    	
     	SiteAccessEntries listSiteAccess = new SiteAccessEntries();
@@ -91,8 +127,6 @@ public class MyResource {
         }
         
     return listSiteAccess;
-    
-//    	return sbReturn.toString();
     }
     
     
