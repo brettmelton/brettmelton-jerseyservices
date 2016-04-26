@@ -1,0 +1,13 @@
+
+*.class
+
+*.war
+
+target/*
+
+*.jpg
+
+*.png
+
+*.pdf
+

@@ -35,7 +35,8 @@ public class MyResourceTest {
      */
     @Test
     public void testGetIt() {
-        String responseMsg = target.path("test").request().get(String.class);
-        assertEquals("Got it!", responseMsg);
+        String responseMsg = target.path("siteaccess").request().get(String.class);
+        System.out.println(responseMsg);
+        assertNotNull(responseMsg);
     }
 }
