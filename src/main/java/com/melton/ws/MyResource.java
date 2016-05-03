@@ -1,5 +1,7 @@
 package com.melton.ws;
 
+import io.swagger.annotations.*;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,11 +17,13 @@ import javax.ws.rs.core.*;
 
 import com.melton.ws.pojo.SiteAccessBean;
 import com.melton.ws.pojo.SiteAccessEntries;
- 
+
 /**
  * Root resource (exposed at "access" path)
  */
 @Path("siteaccess")
+@Api(value = "/siteaccess", tags = "siteaccess")
+@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class MyResource {
  
     private static DataSource s_ds;
@@ -30,6 +34,9 @@ public class MyResource {
 	
 	@DELETE
 	@Path("/{agent}")
+	@ApiOperation(value = "Deletes UserAgents with regularexpression matching")
+	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid UserAgent"),
+	    @ApiResponse(code = 404, message = "UserAgent not found") })
 	public Response deleteEntriesbyAgent(@PathParam("agent") String strAgent) {
 
         Connection conn = null;
@@ -70,6 +77,11 @@ public class MyResource {
      * to the client as json media type.
      */
     @GET
+    @ApiOperation(value = "Finds most recent site acccess", 
+      notes = "This will only provide the most recent site access entries up to the number you provide or 2 by default",
+      response = SiteAccessEntries.class, 
+      responseContainer = "List")
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid value") })
     @Produces(MediaType.APPLICATION_JSON)   // TEXT_PLAIN
     public SiteAccessEntries getLastAccess(
         @DefaultValue("2") @QueryParam("num") int iNumItems) {
